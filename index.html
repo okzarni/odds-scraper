@@ -2,17 +2,24 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>Live Odds Dashboard</title>
+  <title>Live Football Odds Dashboard</title>
   <style>
     body { font-family: Arial; background:#111; color:#fff; padding:20px;}
-    table { border-collapse: collapse; width:100%; margin-top:20px;}
-    th, td { border:1px solid #444; padding:8px; text-align:center;}
-    th { background:#222;}
+    h2 { text-align:center; }
+    table { border-collapse: collapse; width:100%; margin-top:20px; }
+    th, td { border:1px solid #444; padding:8px; text-align:center; }
+    th { background:#222; }
+    td.home-change.up { background: #144214; color:#0f0; }     /* home odds up */
+    td.home-change.down { background: #441414; color:#f00; }   /* home odds down */
+    td.draw-change.up { background: #144214; color:#0f0; }
+    td.draw-change.down { background: #441414; color:#f00; }
+    td.away-change.up { background: #144214; color:#0f0; }
+    td.away-change.down { background: #441414; color:#f00; }
   </style>
 </head>
 <body>
 
-<h2>Live Odds Movement</h2>
+<h2>Live Football Odds Dashboard</h2>
 
 <table id="oddsTable">
   <thead>
@@ -29,30 +36,48 @@
 </table>
 
 <script>
+let previousData = {};
+
 async function loadOdds(){
-  const res = await fetch("https://raw.githubusercontent.com/okzarni/odds-scraper/main/odds.json");
-  const data = await res.json();
+  try {
+    const res = await fetch("https://raw.githubusercontent.com/okzarni/odds-scraper/main/odds.json");
+    const data = await res.json();
 
-  const table = document.querySelector("#oddsTable tbody");
-  table.innerHTML = "";
+    const table = document.querySelector("#oddsTable tbody");
+    table.innerHTML = "";
 
-  data.forEach(match=>{
-    match.bookmakers.forEach(book=>{
-      const row = `
-        <tr>
-          <td>${match.match}</td>
-          <td>${book.name}</td>
-          <td>${book.home}</td>
-          <td>${book.draw}</td>
-          <td>${book.away}</td>
-          <td>${match.time}</td>
-        </tr>
-      `;
-      table.innerHTML += row;
+    data.forEach(match=>{
+      const matchKey = match.match;
+
+      match.bookmakers.forEach(book=>{
+        const prev = (previousData[matchKey] && previousData[matchKey][book.name]) || {};
+        const homeClass = prev.home && prev.home != book.home ? (book.home > prev.home ? 'up' : 'down') : '';
+        const drawClass = prev.draw && prev.draw != book.draw ? (book.draw > prev.draw ? 'up' : 'down') : '';
+        const awayClass = prev.away && prev.away != book.away ? (book.away > prev.away ? 'up' : 'down') : '';
+
+        const row = `
+          <tr>
+            <td>${match.match}</td>
+            <td>${book.name}</td>
+            <td class="home-change ${homeClass}">${book.home}</td>
+            <td class="draw-change ${drawClass}">${book.draw}</td>
+            <td class="away-change ${awayClass}">${book.away}</td>
+            <td>${match.time || ''}</td>
+          </tr>
+        `;
+        table.innerHTML += row;
+
+        // save current values for next comparison
+        if(!previousData[matchKey]) previousData[matchKey]={};
+        previousData[matchKey][book.name] = { home: book.home, draw: book.draw, away: book.away };
+      });
     });
-  });
+  } catch(e){
+    console.error("Failed to load odds:", e);
+  }
 }
 
+// load every 1 minute
 loadOdds();
 setInterval(loadOdds, 60000);
 </script>
