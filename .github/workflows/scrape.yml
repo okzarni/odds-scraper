@@ -1,9 +1,9 @@
 name: Odds Scraper
 
 on:
-  workflow_dispatch:   # ← ဒီလိုထည့်ရင် Run workflow button ပေါ်မယ်
   schedule:
-    - cron: "*/15 * * * *"
+    - cron: "*/15 * * * *"  # 15 min interval
+  workflow_dispatch:       # Manual run လည်း support
 
 jobs:
   scrape:
@@ -15,17 +15,20 @@ jobs:
 
       - name: Setup Python
         uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
 
       - name: Install dependencies
-        run: pip install requests beautifulsoup4
+        run: |
+          pip install requests beautifulsoup4
 
       - name: Run scraper
         run: python scraper.py
 
-      - name: Commit results
+      - name: Commit results with PAT
         run: |
           git config --global user.name "github-actions"
           git config --global user.email "actions@github.com"
           git add odds.json
-          git commit -m "update odds data"
-          git push
+          git commit -m "update odds data" || echo "No changes to commit"
+          git push https://${{ secrets.GH_PAT }}@github.com/okzarni/odds-scraper.git HEAD:main
