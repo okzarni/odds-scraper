@@ -1,6 +1,7 @@
 name: Odds Scraper
 
 on:
+  workflow_dispatch:   # ← ဒီလိုထည့်ရင် Run workflow button ပေါ်မယ်
   schedule:
     - cron: "*/15 * * * *"
 
