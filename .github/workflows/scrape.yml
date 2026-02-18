@@ -1,31 +1,4 @@
-name: Odds Scraper
-
-on:
-  schedule:
-    - cron: "*/15 * * * *"  # 15 min interval
-  workflow_dispatch:       # Manual run လည်း support
-
-jobs:
-  scrape:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout repo
-        uses: actions/checkout@v3
-
-      - name: Setup Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.x'
-
-      - name: Install dependencies
-        run: |
-          pip install requests beautifulsoup4
-
-      - name: Run scraper
-        run: python scraper.py
-
-      - name: Commit results with PAT
+- name: Commit results with PAT
         run: |
           git config --global user.name "github-actions"
           git config --global user.email "actions@github.com"
