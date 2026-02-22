@@ -1,1 +1,20 @@
-[]
+[
+    {
+        "match": "Arsenal vs Chelsea",
+        "time": "2026-02-22 07:08",
+        "bookmakers": [
+            {
+                "name": "Bet365",
+                "home": 1.8,
+                "draw": 3.5,
+                "away": 4.2
+            },
+            {
+                "name": "1xBet",
+                "home": 1.85,
+                "draw": 3.4,
+                "away": 4.1
+            }
+        ]
+    }
+]
