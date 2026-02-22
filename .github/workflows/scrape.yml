@@ -1,40 +1,4 @@
-name: Odds Scraper
-
-# Workflow triggers
-on:
-  workflow_dispatch:  # Manual run လုပ်နိုင်စေ
-  schedule:
-    - cron: "*/15 * * * *"  # 15 မိနစ်တိုင်း auto run
-
-jobs:
-  scrape:
-    runs-on: ubuntu-latest
-
-    steps:
-      # Step 1: Checkout repo
-      - name: Checkout repository
-        uses: actions/checkout@v3
-
-      # Step 2: Setup Python environment
-      - name: Setup Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.x'
-
-      # Step 3: Install dependencies
-      - name: Install dependencies
-        run: pip install requests beautifulsoup4
-
-      # Step 4: Run scraper script
-      - name: Run scraper
-        run: python scraper.py
-
-      # Step 5: Commit updated odds.json
-      - name: Commit and push results
-        uses: stefanzweifel/git-auto-commit-action@v4
-        with:
-          commit_message: "Update odds data"
-          branch: main
-          file_pattern: odds.json
-          commit_user_name: github-actions
-          commit_user_email: actions@github.com
+- name: Install dependencies
+  run: |
+    pip install playwright
+    playwright install chromium
